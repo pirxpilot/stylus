@@ -29,8 +29,6 @@ cases.forEach(function(test){
     .include(__dirname + '/test/cases/import.basic')
     .define('url', stylus.url());
 
-  if (~test.indexOf('compress')) style.set('compress', true);
-
   var runs = []
     , n = times
     , start;

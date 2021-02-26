@@ -26,7 +26,6 @@ Stylus ships with the `stylus` executable for converting Stylus to CSS.
         -o, --out <dir>         Output to <dir> when passing files
         -C, --css <src> [dest]  Convert CSS input to Stylus
         -I, --include <path>    Add <path> to lookup paths
-        -c, --compress          Compress CSS output
         -d, --compare           Display input along with output
         -f, --firebug           Emits debug infos in the generated CSS that
                                 can be used by the FireStylus Firebug plugin
@@ -52,7 +51,7 @@ Stylus ships with the `stylus` executable for converting Stylus to CSS.
 
  `stylus` reads from _stdin_ and outputs to _stdout_, so for example:
 
-      $ stylus --compress < some.styl > some.css
+      $ stylus < some.styl > some.css
 
 Try Stylus some in the terminal!  Type below and press `CTRL-D` for `__EOF__`:
 

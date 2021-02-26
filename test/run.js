@@ -17,7 +17,6 @@ addSuite('integration', readDir('test/cases'), function(test) {
       .include(__dirname + '/images')
       .include(__dirname + '/cases/import.basic');
 
-  if(~test.indexOf('compress')) style.set('compress', true);
   if(~test.indexOf('include')) style.set('include css', true);
   if(~test.indexOf('prefix.')) style.set('prefix', 'prefix-');
   if(~test.indexOf('hoist.')) style.set('hoist atrules', true);
@@ -76,7 +75,6 @@ addSuite('sourcemap', readDir('test/sourcemap'), function(test) {
 describe('JS API', function() {
   it('define a variable with object as hash', function() {
     stylus('body { foo: test-obj.baz.foo.quz; bar: test-obj.bar[0].foo  }')
-      .set('compress', true)
       .define('test-obj', {
         bar: [{ foo: 1 }],
         baz: {
@@ -87,7 +85,6 @@ describe('JS API', function() {
 
   it('define a variable with object as list', function() {
     stylus('body { foo: test-obj  }')
-      .set('compress', true)
       .define('test-obj', {
         baz: {
           foo: { quz: 'quz' }

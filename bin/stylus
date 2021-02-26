@@ -25,12 +25,6 @@ var args = process.argv.slice(2);
 var compare = false;
 
 /**
- * Compress flag.
- */
-
-var compress = false;
-
-/**
  * CSS conversion flag.
  */
 

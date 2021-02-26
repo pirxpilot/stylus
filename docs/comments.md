@@ -17,7 +17,7 @@ permalink: docs/comments.html
 
 ## Multi-line
 
-   Multi-line comments look identical to regular CSS comments. However, they only output when the `compress` option is not enabled.
+   Multi-line comments look identical to regular CSS comments.
 
     /*
      * Adds the given numbers together.

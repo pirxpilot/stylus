@@ -21,7 +21,6 @@ Return Connect middleware with the given `options`.
                   when undefined defaults to `src`.
       `compile`   Custom compile function, accepting the arguments
                   `(str, path)`.
-      `compress`  Whether the output .css files should be compressed
       `firebug`   Emits debug infos in the generated css that can
                   be used by the FireStylus Firebug plugin
       `linenos`   Emits comments in the generated css indicating 
@@ -56,7 +55,6 @@ Return Connect middleware with the given `options`.
      function compile(str, path) {
        return stylus(str)
          .set('filename', path)
-         .set('compress', true)
          .use(nib())
          .import('nib');
      }
