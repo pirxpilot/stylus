@@ -49,5 +49,10 @@
     "example": "examples",
     "test": "test"
   },
+  "files": [
+    "index.js",
+    "bin",
+    "lib"
+  ],
   "license": "MIT"
 }
