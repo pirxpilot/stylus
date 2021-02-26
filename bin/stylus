@@ -11,7 +11,6 @@ var fs = require('fs')
   , extname = require('path').extname
   , resolve = require('path').resolve
   , join = require('path').join
-  , isWindows = process.platform === 'win32'
 
 /**
  * Arguments.
@@ -88,12 +87,6 @@ var paths = [];
  */
 
 var dest;
-
-/**
- * Watcher hash.
- */
-
-var watchers;
 
 /**
  * Enable REPL.
@@ -176,7 +169,6 @@ var usage = [
   , '    -i, --interactive       Start interactive REPL'
   , '    -u, --use <path>        Utilize the Stylus plugin at <path>'
   , '    -U, --inline            Utilize image inlining via data URI support'
-  , '    -w, --watch             Watch file(s) for changes and re-compile'
   , '    -o, --out <dir>         Output to <dir> when passing files'
   , '    -C, --css <src> [dest]  Convert CSS input to Stylus'
   , '    -I, --include <path>    Add <path> to lookup paths'
@@ -317,10 +309,6 @@ while (args.length) {
       if (!path) throw new Error('--include <path> required');
       paths.push(path);
       break;
-    case '-w':
-    case '--watch':
-      watchers = {};
-      break;
     case '-U':
     case '--inline':
       args.unshift('--use', 'url');
@@ -368,16 +356,6 @@ while (args.length) {
     default:
       files.push(arg);
   }
-}
-
-// if --watch is used, assume we are
-// not working with stdio
-
-if (watchers && !files.length) {
-  files = fs.readdirSync(process.cwd())
-    .filter(function(file){
-    return file.match(/\.styl$/);
-  });
 }
 
 // --sourcemap flag is not working with stdio
@@ -677,13 +655,8 @@ function compileFile(file) {
         usePlugins(style);
         importFiles(style);
         style.render(function(err, css){
-          watchImports(file, options._imports);
           if (err) {
-            if (watchers) {
-              console.error(err.stack || err.message);
-            } else {
-              throw err;
-            }
+            throw err;
           } else {
             writeFile(file, css);
             // write sourcemap
@@ -741,8 +714,6 @@ function writeFile(file, css) {
   fs.writeFile(path, css, function(err){
     if (err) throw err;
     console.log('  \033[90mcompiled\033[0m %s', path);
-    // --watch support
-    watch(file, file);
   });
 }
 
@@ -759,58 +730,6 @@ function writeSourcemap(file, sourcemap) {
     if (err) throw err;
     // don't output log message if --print is present
     if (!print) console.log('  \033[90mgenerated\033[0m %s', path);
-  });
-}
-
-/**
- * Watch the given `file` and recompiling `rootFile` when modified.
- */
-
-function watch(file, rootFile) {
-  // not watching
-  if (!watchers) return;
-
-  // already watched
-  if (watchers[file]) {
-    watchers[file][rootFile] = true;
-    return;
-  }
-
-  // watch the file itself
-  watchers[file] = {};
-  watchers[file][rootFile] = true;
-  if (print) {
-    console.error('Stylus CLI Error: Watch and print cannot be used together');
-    process.exit(1);
-  }
-  if(!quiet){
-		console.log('  \033[90mwatching\033[0m %s', file);
-	}
-  // if is windows use fs.watch api instead
-  // TODO: remove watchFile when fs.watch() works on osx etc
-  if (isWindows) {
-    fs.watch(file, compile);
-  } else {
-    fs.watchFile(file, { interval: 300 }, function(curr, prev) {
-      if (curr.mtime > prev.mtime) compile();
-    });
-  }
-
-  function compile() {
-    for (var rootFile in watchers[file]) {
-      compileFile(rootFile);
-    }
-  }
-}
-
-/**
- * Watch `imports`, re-compiling `file` when they change.
- */
-
-function watchImports(file, imports) {
-  imports.forEach(function(imported){
-    if (!imported.path) return;
-    watch(imported.path, file);
   });
 }
 
