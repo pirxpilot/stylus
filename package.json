@@ -24,18 +24,15 @@
     "stylus": "./bin/stylus"
   },
   "scripts": {
-    "prepublish": "npm prune",
     "test": "mocha test/ test/middleware/ --require should --bail --check-leaks --reporter dot",
     "test-cov": "mocha test/ test/middleware/ --require should --bail --reporter html-cov > coverage.html"
   },
   "dependencies": {
-    "css-parse": "~2.0.0",
-    "debug": "~3.1.0",
+    "css": "^3.0.0",
+    "debug": "~3 || ~4",
     "glob": "^7.1.6",
-    "mkdirp": "~1.0.4",
     "safer-buffer": "^2.1.2",
     "sax": "~1.2.4",
-    "semver": "^6.3.0",
     "source-map": "^0.7.3"
   },
   "devDependencies": {
@@ -48,5 +45,10 @@
     "example": "examples",
     "test": "test"
   },
+  "files": [
+    "index.js",
+    "bin",
+    "lib"
+  ],
   "license": "MIT"
 }

@@ -5,7 +5,6 @@
 
 var stylus = require('../')
   , fs = require('fs')
-  , should = require('should');
 
 // integration cases
 
@@ -63,7 +62,7 @@ addSuite('sourcemap', readDir('test/sourcemap'), function(test) {
   style.render(function(err, css) {
     if(err) throw err;
     if(inline) {
-      style.sourcemap.sourcesContent.should.not.be.empty;
+      style.sourcemap.sourcesContent.should.not.be.empty();
       if(~test.indexOf('utf-8')) comment += 'charset=utf-8;';
       css.should.containEql(comment + 'base64,');
     } else {

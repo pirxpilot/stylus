@@ -11,9 +11,6 @@ var fs = require('fs')
   , extname = require('path').extname
   , resolve = require('path').resolve
   , join = require('path').join
-  , isWindows = process.platform === 'win32'
-  , semver = require('semver')
-  , mkdirSync = semver.satisfies(process.version, '>=10.12.0') ? fs.mkdirSync : require('mkdirp').sync;
 
 /**
  * Arguments.
@@ -90,12 +87,6 @@ var paths = [];
  */
 
 var dest;
-
-/**
- * Watcher hash.
- */
-
-var watchers;
 
 /**
  * Enable REPL.
@@ -178,7 +169,6 @@ var usage = [
   , '    -i, --interactive       Start interactive REPL'
   , '    -u, --use <path>        Utilize the Stylus plugin at <path>'
   , '    -U, --inline            Utilize image inlining via data URI support'
-  , '    -w, --watch             Watch file(s) for changes and re-compile'
   , '    -o, --out <dir>         Output to <dir> when passing files'
   , '    -C, --css <src> [dest]  Convert CSS input to Stylus'
   , '    -I, --include <path>    Add <path> to lookup paths'
@@ -197,7 +187,7 @@ var usage = [
   , '    -p, --print             Print out the compiled CSS'
   , '    --import <file>         Import stylus <file>'
   , '    --include-css           Include regular CSS on @import'
-  , '	 --ext			 Specify custom file extension for compiled file, default .css'	
+  , '	 --ext			 Specify custom file extension for compiled file, default .css'
   , '    -D, --deps              Display dependencies of the compiled file'
   , '    --disable-cache         Disable caching'
   , '    --hoist-atrules         Move @import and @charset to the top'
@@ -319,10 +309,6 @@ while (args.length) {
       if (!path) throw new Error('--include <path> required');
       paths.push(path);
       break;
-    case '-w':
-    case '--watch':
-      watchers = {};
-      break;
     case '-U':
     case '--inline':
       args.unshift('--use', 'url');
@@ -338,7 +324,9 @@ while (args.length) {
         args.shift();
         options = args.shift();
         if (!options) throw new Error('--with <options> required');
+        // jshint -W061
         options = eval('(' + options + ')');
+        // jshint +W061
       }
 
       // url support
@@ -368,16 +356,6 @@ while (args.length) {
     default:
       files.push(arg);
   }
-}
-
-// if --watch is used, assume we are
-// not working with stdio
-
-if (watchers && !files.length) {
-  files = fs.readdirSync(process.cwd())
-    .filter(function(file){
-    return file.match(/\.styl$/);
-  });
 }
 
 // --sourcemap flag is not working with stdio
@@ -507,13 +485,11 @@ function repl() {
 
   // HACK: flat-list auto-complete
   function autocomplete(line){
-    var out = process.stdout
-      , keys = Object.keys(global.locals)
+    var keys = Object.keys(global.locals)
       , len = keys.length
       , words = line.split(/\s+/)
       , word = words.pop()
       , names = []
-      , name
       , node
       , key;
 
@@ -533,7 +509,7 @@ function repl() {
     }
 
     return [names, line];
-  };
+  }
 
   repl.on('line', function(line){
     if (!line.trim().length) return repl.prompt();
@@ -545,6 +521,7 @@ function repl() {
       evaluator.root = expr;
       var ret = evaluator.evaluate();
       var node;
+      //jshint -W084
       while (node = ret.nodes.pop()) {
         if (!node.suppress) {
           var str = node.toString();
@@ -553,6 +530,7 @@ function repl() {
           break;
         }
       }
+      //jshint +W084
       repl.prompt();
     } catch (err) {
       console.error('\033[31merror: %s\033[0m', err.message || err.stack);
@@ -640,7 +618,7 @@ function compileFiles(files) {
 function displayDeps() {
   files.forEach(function(file){
     // ensure file exists
-    fs.stat(file, function(err, stat){
+    fs.stat(file, function(err){
       if (err) throw err;
       fs.readFile(file, 'utf8', function(err, str){
         if (err) throw err;
@@ -677,13 +655,8 @@ function compileFile(file) {
         usePlugins(style);
         importFiles(style);
         style.render(function(err, css){
-          watchImports(file, options._imports);
           if (err) {
-            if (watchers) {
-              console.error(err.stack || err.message);
-            } else {
-              throw err;
-            }
+            throw err;
           } else {
             writeFile(file, css);
             // write sourcemap
@@ -736,13 +709,11 @@ function writeFile(file, css) {
   if (print) return process.stdout.write(css);
   var path = createPath(file);
 
-  mkdirSync(dirname(path), { recursive: true })
+  fs.mkdirSync(dirname(path), { recursive: true })
 
   fs.writeFile(path, css, function(err){
     if (err) throw err;
-    console.log('  \033[90mcompiled\033[0m %s', path);
-    // --watch support
-    watch(file, file);
+    if (!quiet) console.log('  \033[90mcompiled\033[0m %s', path);
   });
 }
 
@@ -753,64 +724,12 @@ function writeFile(file, css) {
 function writeSourcemap(file, sourcemap) {
   var path = createPath(file, true);
 
-  mkdirSync(dirname(path), { recursive: true })
+  fs.mkdirSync(dirname(path), { recursive: true })
 
   fs.writeFile(path, JSON.stringify(sourcemap), function(err){
     if (err) throw err;
     // don't output log message if --print is present
-    if (!print) console.log('  \033[90mgenerated\033[0m %s', path);
-  });
-}
-
-/**
- * Watch the given `file` and recompiling `rootFile` when modified.
- */
-
-function watch(file, rootFile) {
-  // not watching
-  if (!watchers) return;
-
-  // already watched
-  if (watchers[file]) {
-    watchers[file][rootFile] = true;
-    return;
-  }
-
-  // watch the file itself
-  watchers[file] = {};
-  watchers[file][rootFile] = true;
-  if (print) {
-    console.error('Stylus CLI Error: Watch and print cannot be used together');
-    process.exit(1);
-  }
-  if(!quiet){
-		console.log('  \033[90mwatching\033[0m %s', file);
-	}
-  // if is windows use fs.watch api instead
-  // TODO: remove watchFile when fs.watch() works on osx etc
-  if (isWindows) {
-    fs.watch(file, compile);
-  } else {
-    fs.watchFile(file, { interval: 300 }, function(curr, prev) {
-      if (curr.mtime > prev.mtime) compile();
-    });
-  }
-
-  function compile() {
-    for (var rootFile in watchers[file]) {
-      compileFile(rootFile);
-    }
-  }
-}
-
-/**
- * Watch `imports`, re-compiling `file` when they change.
- */
-
-function watchImports(file, imports) {
-  imports.forEach(function(imported){
-    if (!imported.path) return;
-    watch(imported.path, file);
+    if (!quiet && !print) console.log('  \033[90mgenerated\033[0m %s', path);
   });
 }
 
@@ -822,7 +741,7 @@ function usePlugins(style) {
   plugins.forEach(function(plugin){
     var path = plugin.path;
     var options = plugin.options;
-    fn = require(/^\.+\//.test(path) ? resolve(path) : path);
+    var fn = require(/^\.+\//.test(path) ? resolve(path) : path);
     if ('function' != typeof fn) {
       throw new Error('plugin ' + path + ' does not export a function');
     }
