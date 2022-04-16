@@ -166,7 +166,6 @@ var usage = [
   , '    -o, --out <dir>         Output to <dir> when passing files'
   , '    -C, --css <src> [dest]  Convert CSS input to Stylus'
   , '    -I, --include <path>    Add <path> to lookup paths'
-  , '    -c, --compress          Compress CSS output'
   , '    -d, --compare           Display input along with output'
   , '    -f, --firebug           Emits debug infos in the generated CSS that'
   , '                            can be used by the FireStylus Firebug plugin'
@@ -207,10 +206,6 @@ while (args.length) {
     case '-d':
     case '--compare':
       compare = true;
-      break;
-    case '-c':
-    case '--compress':
-      compress = true;
       break;
     case '-C':
     case '--css':
@@ -410,7 +405,6 @@ if (files.length > 1 && isCSS(dest)) {
 
 var options = {
     filename: 'stdin'
-  , compress: compress
   , firebug: firebug
   , linenos: linenos
   , sourcemap: sourcemap

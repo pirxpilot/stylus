@@ -28,7 +28,7 @@ permalink: docs/comments.html
 
 ## Multi-line buffered
 
-   Multi-line comments which are not suppressed start with `/*!`. This tells Stylus to output the comment regardless of compression.
+   Multi-line comments which are not suppressed start with `/*!`.
 
     /*!
      * Adds the given numbers together.

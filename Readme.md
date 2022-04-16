@@ -7,6 +7,8 @@ This is a fork of a [stylus] package. Check [original project] Readme for more i
 
 ## Changes in this fork
 
+- removed compress functionality
+
 ## License
 
 (The MIT License)

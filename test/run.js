@@ -95,7 +95,6 @@ describe('JS API', function() {
   it('use variable from options object', function() {
     stylus
       .render('body { foo: bar  }', {
-        compress: true,
         globals: {
           'bar': 'baz'
         }
@@ -107,7 +106,6 @@ describe('JS API', function() {
       globals: {
         $red: '#E20303'
       },
-      compress: true
     }).render().should.equal('body{color:rgba(226,3,3,0.5)}');
   });
 
@@ -116,7 +114,6 @@ describe('JS API', function() {
       .render(
         'body { foo: add(4, 3); bar: something() }',
         {
-          compress: true,
           functions: {
             add: function(a, b) {
               return a.operate('+', b);
@@ -137,14 +134,12 @@ describe('JS API', function() {
     };
 
     stylus('body { foo: bar  }', {
-      compress: true,
       use: plugin('bar', 'baz')
     }).render().should.equal('body{foo:baz}');
 
     stylus('body { foo: bar; foo: qux  }', {
-      compress: true,
       use: [plugin('bar', 'baz'), plugin('qux', 'fred')]
-    }).render().should.equal('body{foo:baz;foo:fred}');
+    }).render().should.equal('body { foo: baz; foo: fred }');
   });
 
   it('import cloning with cache', function() {
@@ -152,10 +147,10 @@ describe('JS API', function() {
       , styl = readFile(path + 'clone.styl')
       , css = 'body{background:linear-gradient(from bottom,#f00,#00f)}';
 
-    stylus(styl, { compress: true })
+    stylus(styl)
       .render().should.equal(css);
 
-    stylus('@import "clone"', { compress: true, paths: [path] })
+    stylus('@import "clone"', { paths: [path] })
       .render().should.equal(css);
   });
 
@@ -164,10 +159,10 @@ describe('JS API', function() {
       , styl = fs.readFileSync(path + 'clone2.styl', 'utf-8').replace(/\r/g, '')
       , css = 'body{color:#f00}body{color:#00f}body{color:#00f}body{color:#00f}body{color:#008000}';
 
-    stylus(styl, { compress: true })
+    stylus(styl)
       .render().should.equal(css);
 
-    stylus('@import "clone2"', { compress: true, paths: [path] })
+    stylus('@import "clone2"', { paths: [path] })
       .render().should.equal(css);
   });
 
@@ -181,14 +176,13 @@ describe('JS API', function() {
   });
 
   it('conditional assignment with define', function() {
-    stylus('foo ?= baz; body { test: foo }', { compress: true })
+    stylus('foo ?= baz; body { test: foo }')
       .define('foo', new stylus.nodes.Literal('bar'))
       .render().should.equal("body{test:bar}");
   });
 
   it('sourcemap with dest option set to a file name', function() {
     var style = stylus('body { color: red }', {
-      compress: true,
       sourcemap: true,
       filename: 'test.styl',
       dest: 'test/build.css'
