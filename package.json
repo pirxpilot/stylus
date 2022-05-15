@@ -28,7 +28,6 @@
     "test-cov": "mocha test/ test/middleware/ --require should --bail --reporter html-cov > coverage.html"
   },
   "dependencies": {
-    "css": "^3.0.0",
     "debug": "~3 || ~4",
     "glob": "^7.1.6",
     "safer-buffer": "^2.1.2",

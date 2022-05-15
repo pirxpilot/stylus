@@ -26,16 +26,6 @@ addSuite('integration', readDir('test/cases'), function(test) {
   style.render().trim().should.equal(css);
 }, ['index']);
 
-// converter cases
-
-addSuite('converter', readDir('test/converter', '.css'), function(test) {
-  var path = 'test/converter/' + test + '.styl'
-    , styl = readFile(path)
-    , css = readFile('test/converter/' + test + '.css');
-
-  stylus.convertCSS(css).trim().should.equal(styl);
-});
-
 // deps resolver cases
 
 addSuite('dependency resolver', readDir('test/deps-resolver'), function(test) {
