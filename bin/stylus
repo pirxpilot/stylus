@@ -31,12 +31,6 @@ var compare = false;
 var compress = false;
 
 /**
- * CSS conversion flag.
- */
-
-var convertCSS = false;
-
-/**
  * Line numbers flag.
  */
 
@@ -170,7 +164,6 @@ var usage = [
   , '    -u, --use <path>        Utilize the Stylus plugin at <path>'
   , '    -U, --inline            Utilize image inlining via data URI support'
   , '    -o, --out <dir>         Output to <dir> when passing files'
-  , '    -C, --css <src> [dest]  Convert CSS input to Stylus'
   , '    -I, --include <path>    Add <path> to lookup paths'
   , '    -c, --compress          Compress CSS output'
   , '    -d, --compare           Display input along with output'
@@ -217,10 +210,6 @@ while (args.length) {
     case '-c':
     case '--compress':
       compress = true;
-      break;
-    case '-C':
-    case '--css':
-      convertCSS = true;
       break;
     case '-f':
     case '--firebug':
@@ -432,25 +421,7 @@ var str = '';
 
 // Convert CSS to Stylus
 
-if (convertCSS) {
-    switch (files.length) {
-    case 2:
-      compileCSSFile(files[0], files[1]);
-      break;
-    case 1:
-      var file = files[0];
-      compileCSSFile(file, join(dirname(file), basename(file, extname(file))) + '.styl');
-      break;
-    default:
-      var stdin = process.openStdin();
-      stdin.setEncoding('utf8');
-      stdin.on('data', function(chunk){ str += chunk; });
-      stdin.on('end', function(){
-        var out = stylus.convertCSS(str);
-        console.log(out);
-      });
-  }
-} else if (interactive) {
+if (interactive) {
   repl();
 } else if (deps) {
   // if --deps is used, just display list of the dependencies
@@ -555,25 +526,6 @@ function highlight(str) {
     })
     .replace(/(#[\da-fA-F]+)/g, '\033[33m$1\033[0m')
     .replace(/('.*?'|".*?")/g, '\033[32m$1\033[0m');
-}
-
-/**
- * Convert a CSS file to a Styl file
- */
-
-function compileCSSFile(file, fileOut) {
-  fs.stat(file, function(err, stat){
-    if (err) throw err;
-    if (stat.isFile()) {
-      fs.readFile(file, 'utf8', function(err, str){
-        if (err) throw err;
-        var styl = stylus.convertCSS(str);
-        fs.writeFile(fileOut, styl, function(err){
-         if (err) throw err;
-        });
-      });
-    }
-  });
 }
 
 /**
