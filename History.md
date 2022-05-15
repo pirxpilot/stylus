@@ -1,3 +1,12 @@
+
+1.0.0 / 2022-05-15
+==================
+
+ * remove convert CSS `-C|-css` option
+ * update dependencies
+ * fix quiet flag
+ * rename fork package
+
 0.54.5 / 2016-04-28
 ===================
 
