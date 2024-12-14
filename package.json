@@ -24,19 +24,16 @@
     "stylus": "./bin/stylus"
   },
   "scripts": {
-    "test": "mocha test/ test/middleware/ --require should --bail --check-leaks --reporter dot",
-    "test-cov": "mocha test/ test/middleware/ --require should --bail --reporter html-cov > coverage.html"
+    "test": "node --test --require should test/run.js test/middleware"
   },
   "dependencies": {
     "debug": "~3 || ~4",
-    "glob": "^7.1.6",
+    "glob": "~8",
     "safer-buffer": "^2.1.2",
-    "sax": "~1.2.4",
+    "sax": "^1.2.4",
     "source-map": "^0.7.3"
   },
   "devDependencies": {
-    "jscoverage": "~0.6.0",
-    "mocha": "~10",
     "should": "^13.2.3"
   },
   "directories": {
