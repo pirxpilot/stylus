@@ -1,10 +1,12 @@
+const { describe, it } = require('node:test');
+
 var stylus = require('../../')
   , fs = require('fs');
 
 describe('middleware', function() {
     var res = {};
 
-    it('accepts functions for src and dest options', function(done){
+    it('accepts functions for src and dest options', function(t, done){
       var req = { method: 'GET', url: 'foo/bar/all.css' };
       stylus.middleware({
         src: function(path) {
@@ -16,7 +18,7 @@ describe('middleware', function() {
       })(req, res, done);
     });
 
-    it('compiles a stylus file if it exists', function(done){
+    it('compiles a stylus file if it exists', function(t, done){
       var req = { method: 'GET', url: '/test.css' }
         , path;
       stylus.middleware({
@@ -30,7 +32,7 @@ describe('middleware', function() {
       });
     });
 
-    it('should generate a sourcemap', function(done){
+    it('should generate a sourcemap', function(t, done){
       var req = { method: 'GET', url: '/test.css' }
         , path;
       stylus.middleware({

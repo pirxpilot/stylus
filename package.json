@@ -24,7 +24,7 @@
     "stylus": "./bin/stylus"
   },
   "scripts": {
-    "test": "mocha test/ test/middleware/ --require should --bail --check-leaks --reporter dot"
+    "test": "node --test --require should test/run.js test/middleware"
   },
   "dependencies": {
     "debug": "~3 || ~4",
@@ -34,7 +34,6 @@
     "source-map": "^0.7.3"
   },
   "devDependencies": {
-    "mocha": "~11",
     "should": "^13.2.3"
   },
   "directories": {
