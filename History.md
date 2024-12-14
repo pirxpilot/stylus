@@ -1,4 +1,11 @@
 
+1.0.1 / 2024-12-14
+==================
+
+ * replace mocha with node:test
+ * remove coverage related task
+ * update dependencies
+
 1.0.0 / 2022-05-15
 ==================
 
