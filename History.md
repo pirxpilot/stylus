@@ -1,4 +1,14 @@
 
+1.1.0 / 2024-12-14
+==================
+
+ * add support for CSS Values 4 viewport-relative units (#2775)
+ * add support full css4 logical combination (#2684)
+ * fix variable names beginning with a keyword and dash (#2634)
+ * fix `@import` url() error in dependency resolver (#2632)
+ * add deg and fr as exceptions for 0 value unit omission (#2578)
+ * add inverse trigonometric functions as bifs
+
 1.0.1 / 2024-12-14
 ==================
 
